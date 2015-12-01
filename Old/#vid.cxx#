@@ -1,0 +1,167 @@
+// Debugging functions to print various video characteristics
+
+void print_vid_cap(video_capability &vc);
+void print_vid_pic(video_picture &vp);
+void print_vid_buf(video_mbuf &vm);
+void print_vid_chan(video_channel &vchn);
+void print_vid_win(video_window &vw);
+int video_auxilliary(int vid);
+
+
+
+
+// ************************************************************************************
+
+// Debugging functions to print various video characteristics
+
+void print_vid()
+{
+  cout << "\nVideo device characteristics:\n";
+  cout << "name: " << vc.name << '\n';
+  cout << "type: " << vc.type << '\n';
+  if(vc.type & VID_TYPE_CAPTURE)
+    cout << "Can capture to memory.\n";
+  if(vc.type & VID_TYPE_TUNER)
+    cout << "Has a tuner of some form.\n";
+  if(vc.type & VID_TYPE_TELETEXT)
+    cout << "Has teletext capability.\n";
+  if(vc.type & VID_TYPE_OVERLAY)
+    cout << "Can overlay its image onto the frame buffer.\n";
+  if(vc.type & VID_TYPE_CHROMAKEY)
+    cout << "Overlay is Chromakeyed.\n";
+  if(vc.type & VID_TYPE_CLIPPING)
+    cout << "Overlay clipping is supported.\n";
+  if(vc.type & VID_TYPE_FRAMERAM)
+    cout << "Overlay overwrites frame buffer memory.\n";
+  if(vc.type & VID_TYPE_SCALES)
+    cout << "The hardware supports image scaling.\n";
+  if(vc.type & VID_TYPE_MONOCHROME)
+    cout << "Image capture is grey scale only.\n";
+  if(vc.type & VID_TYPE_SUBCAPTURE)
+    cout << "Capture can be of only part of the image.\n";
+  cout << "channels: " << vc.channels << '\n';
+  cout << "audios: " << vc.audios << '\n';
+  cout << "maxwidth: " << vc.maxwidth << '\n';
+  cout << "maxheight: " << vc.maxheight << '\n';
+  cout << "minwidth: " << vc.minwidth << '\n';
+  cout << "minheight: " << vc.minheight << endl;
+ }
+
+
+
+void print_vid_pic(video_picture &vp)
+{
+  cout << "\nVideo picture characteristics:\n";
+  cout << "brightness: " << vp.brightness << '\n';
+  cout << "hue: " << vp.hue << '\n';
+  cout << "colour: " << vp.colour << '\n';
+  cout << "contrast: " << vp.contrast << '\n';
+  cout << "whiteness: " << vp.whiteness << '\n';
+  cout << "depth: " << vp.depth << '\n';
+  cout << "palette: " << vp.palette << endl;
+}
+
+void print_vid_buf(video_mbuf &vm)
+{
+  cout << "\nVideo buffer characteristics:\n";
+  cout << "size: " << vm.size << '\n';
+  cout << "frames: " << vm.frames << '\n';
+  cout << "offsets: " << vm.offsets << endl;
+}
+
+void print_vid_chan(video_channel &vchn)
+{
+  cout << "\nVideo channel characteristics:\n";
+  cout << "channel: " << vchn.channel << '\n';
+  cout << "name: " << vchn.name << '\n';
+  cout << "tuners: " << vchn.tuners << '\n';
+  cout << "flags: " << vchn.flags << '\n';
+  cout << "type: " << vchn.type << '\n';
+  cout << "norm: " << vchn.norm << endl;
+}
+
+void print_vid_win(video_window &vw)
+{
+  cout << "\nVideo window characteristics:\n";
+  cout << "x: " << vw.x << '\n';
+  cout << "y: " << vw.y << '\n';
+  cout << "width: " << vw.width << '\n';
+  cout << "height: " << vw.height << '\n';
+  cout << "chromakey: " << vw.chromakey << '\n';
+  cout << "flags: " << vw.flags << endl;
+}
+
+int video_auxilliary(int vid)
+{
+  int error;
+
+  // Get the card's video capability
+
+  video_capability vc;
+  if((error = ioctl(vid, VIDIOCGCAP , &vc)) < 0)
+  {
+    perror ("VIDIOCGCAP");
+    return error;
+  }
+  if(debug)
+    print_vid_cap(vc);
+
+  // Get the picture characteristics
+
+  video_picture vp;
+  if((error = ioctl(vid, VIDIOCGPICT, &vp)) < 0)
+  {
+    perror ("VIDIOCGPICT");
+    return error;
+  }
+  if(debug)
+    print_vid_pic(vp);
+
+  // Set the window, and get its characteristics
+
+  video_window vw;
+  if((error = ioctl(vid, VIDIOCGWIN, &vw)) < 0)
+  {
+    perror ("VIDIOCGWIN");
+    return error;
+  }
+  vw.width=IM_SX;
+  vw.height=IM_SY;
+  vw.x=0;
+  vw.y=0;
+  if((error = ioctl(vid, VIDIOCSWIN, &vw)) < 0)
+  {
+    perror ("VIDIOCSWIN");
+    return error;
+  }
+  if((error = ioctl(vid, VIDIOCGWIN, &vw)) < 0)
+  {
+    perror ("VIDIOCGWIN");
+    error;
+  }
+  if(debug)
+    print_vid_win(vw);
+
+  video_mbuf vm;
+  if((error = ioctl(vid, VIDIOCGMBUF, &vm)) < 0)
+  {
+    perror ("VIDIOCGMBUF");
+    return error;
+  }
+  if(debug)
+    print_vid_buf(vm);
+
+  return 0;
+}
+
+  // If debugging print out all the guff that video_auxilliary(...)
+  // finds out
+
+  if(debug)
+  {
+    if(video_auxilliary(v) < 0)
+    {
+      cerr << "video::video() - Error in video_auxilliary()\n";
+      return;
+    }
+  }

@@ -1,0 +1,28 @@
+#include <rfftw.h>
+#include <iostream.h>
+#define N 32
+{
+     fftw_real in[N], out[N];
+     rfftw_plan p_in;
+     p_in = rfftw_create_plan(N, FFTW_FORWARD, FFTW_ESTIMATE);
+     rfftw_plan p_out;
+     p_out = rfftw_create_plan(N, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+     for(int i = 0; i < N; i++)
+     {
+       in[i] = (float)(i%(N/2))/(float)(N/2);
+       cout << i << ", " << in[i] << endl;
+     }
+     cout << "\n\n\n";
+     rfftw_one(p_in, in, out);
+     //for(int i = 0; i < N; i++)
+     //{
+     //}
+     rfftw_one(p_out, out, in);
+     for(int i = 0; i < N; i++)
+     {
+       cout << i << ", " << in[i] << endl;
+     }
+     cout << "\n\n\n";
+     fftw_destroy_plan(p);  
+}

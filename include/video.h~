@@ -1,0 +1,25 @@
+/*
+ *  Video device software header
+ *
+ *  Adrian Bowyer
+ *  26 October 2003
+ *
+ *  This works with v4l; it'll need to be upgraded for v4l2.
+ */
+
+#ifndef BLIMP_VIDEO_H
+#define BLIMP_VIDEO_H
+
+#include <iostream.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <linux/videodev.h>
+
+#define CHAN 1                 // The composite video chanel
+#define IM_SX 128              // X size of image
+#define IM_SY 128              // Y size of image
+#define VID_DEV "/dev/video0"  // The video device
+
+#endif
